@@ -5,7 +5,7 @@
   "main": "build/react-tiny-virtual-list.cjs.js",
   "module": "build/react-tiny-virtual-list.es.js",
   "jsnext:main": "build/react-tiny-virtual-list.es.js",
-  "types": "types/src/index.d.ts",
+  "types": "types/index.d.ts",
   "files": [
     "build",
     "types"
@@ -57,6 +57,7 @@
     "rollup-plugin-commonjs": "^8.2.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^2.0.1",
+    "rollup-plugin-typescript2": "^0.15.0",
     "tslint": "^5.7.0",
     "tslint-config-shopify": "^3.0.0",
     "typescript": "^2.4.2"
