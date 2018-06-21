@@ -5,7 +5,7 @@
   "main": "build/react-tiny-virtual-list.cjs.js",
   "module": "build/react-tiny-virtual-list.es.js",
   "jsnext:main": "build/react-tiny-virtual-list.es.js",
-  "types": "types/index.d.ts",
+  "types": "types/src/index.d.ts",
   "files": [
     "build",
     "types"
