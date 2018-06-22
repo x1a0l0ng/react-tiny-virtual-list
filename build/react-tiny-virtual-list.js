@@ -353,7 +353,7 @@ var VirtualList = function (_super) {
                     if (typeof onAlign === 'function') {
                         onAlign(alignedIndex);
                     }
-                }, 100);
+                }, 50);
             }
             if (typeof onScroll === 'function') {
                 onScroll(offset, e);
