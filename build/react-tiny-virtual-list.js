@@ -335,7 +335,8 @@ var VirtualList = function (_super) {
         _this.handleScroll = function (e) {
             var _a = _this.props,
                 onScroll = _a.onScroll,
-                shouldScrollAlign = _a.shouldScrollAlign;
+                shouldScrollAlign = _a.shouldScrollAlign,
+                onAlign = _a.onAlign;
             var offset = _this.getNodeOffset();
             if (offset < 0 || _this.state.offset === offset || e.target !== _this.rootNode) {
                 return;
@@ -347,7 +348,11 @@ var VirtualList = function (_super) {
             if (shouldScrollAlign && !_this.scrollAnimating) {
                 clearTimeout(_this.delayAlignment);
                 _this.delayAlignment = setTimeout(function () {
-                    _this.scrollAnimTo(_this.getOffsetForIndex(_this.findAlignedIndex(offset)));
+                    var alignedIndex = _this.findAlignedIndex(offset);
+                    _this.scrollAnimTo(_this.getOffsetForIndex(alignedIndex));
+                    if (typeof onAlign === 'function') {
+                        onAlign(alignedIndex);
+                    }
                 }, 100);
             }
             if (typeof onScroll === 'function') {
@@ -504,14 +509,16 @@ var VirtualList = function (_super) {
             itemSize = _a.itemSize,
             onItemsRendered = _a.onItemsRendered,
             onScroll = _a.onScroll,
+            onAlign = _a.onAlign,
             _c = _a.scrollDirection,
             scrollDirection = _c === void 0 ? DIRECTION_VERTICAL : _c,
             scrollOffset = _a.scrollOffset,
             scrollToIndex = _a.scrollToIndex,
             scrollToAlignment = _a.scrollToAlignment,
+            shouldScrollAlign = _a.shouldScrollAlign,
             style = _a.style,
             width = _a.width,
-            props = __rest(_a, ["estimatedItemSize", "height", "overscanCount", "renderItem", "itemCount", "itemSize", "onItemsRendered", "onScroll", "scrollDirection", "scrollOffset", "scrollToIndex", "scrollToAlignment", "style", "width"]);
+            props = __rest(_a, ["estimatedItemSize", "height", "overscanCount", "renderItem", "itemCount", "itemSize", "onItemsRendered", "onScroll", "onAlign", "scrollDirection", "scrollOffset", "scrollToIndex", "scrollToAlignment", "shouldScrollAlign", "style", "width"]);
         var offset = this.state.offset;
         var _d = this.sizeAndPositionManager.getVisibleRange({
             containerSize: this.props[sizeProp[scrollDirection]] || 0,

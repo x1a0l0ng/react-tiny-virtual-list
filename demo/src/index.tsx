@@ -36,7 +36,9 @@ class Demo extends React.Component {
             })
           }}
           onBlur={() => {
-            this.refs.scroller['scrollAnimTo'](this.refs.scroller['getOffsetForIndex'](Number(scrollIdx)))
+            this.refs.scroller['scrollAnimTo'](
+              this.refs.scroller['getOffsetForIndex'](Number(scrollIdx))
+            )
           }}
         />
         <VirtualList
@@ -47,8 +49,11 @@ class Demo extends React.Component {
           renderItem={this.renderItem}
           itemSize={60}
           className="VirtualList"
-          shouldScrollAlign={true}
+          shouldScrollAlign
           scrollToAlignment="center"
+          onAlign={index => {
+            console.log(index)
+          }}
         />
       </div>
     )

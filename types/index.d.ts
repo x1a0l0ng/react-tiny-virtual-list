@@ -34,6 +34,7 @@ export interface Props {
     shouldScrollAlign?: boolean;
     onItemsRendered?({startIndex, stopIndex}: RenderedRows): void;
     onScroll?(offset: number, event: React.UIEvent<HTMLDivElement>): void;
+    onAlign?(index: number): void;
     renderItem(itemInfo: ItemInfo): React.ReactNode;
 }
 export interface State {

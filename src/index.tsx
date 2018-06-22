@@ -92,6 +92,7 @@ export interface Props {
   shouldScrollAlign?: boolean
   onItemsRendered?({ startIndex, stopIndex }: RenderedRows): void
   onScroll?(offset: number, event: React.UIEvent<HTMLDivElement>): void
+  onAlign?(index: number): void
   renderItem(itemInfo: ItemInfo): React.ReactNode
 }
 
@@ -252,7 +253,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
   }
 
   handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { onScroll, shouldScrollAlign } = this.props
+    const { onScroll, shouldScrollAlign, onAlign } = this.props
     const offset = this.getNodeOffset()
 
     if (
@@ -271,7 +272,11 @@ export default class VirtualList extends React.PureComponent<Props, State> {
     if (shouldScrollAlign && !this.scrollAnimating) {
       clearTimeout(this.delayAlignment)
       this.delayAlignment = setTimeout(() => {
-        this.scrollAnimTo(this.getOffsetForIndex(this.findAlignedIndex(offset)))
+        const alignedIndex = this.findAlignedIndex(offset)
+        this.scrollAnimTo(this.getOffsetForIndex(alignedIndex))
+        if (typeof onAlign === 'function') {
+          onAlign(alignedIndex)
+        }
       }, 100)
     }
 
@@ -393,10 +398,12 @@ export default class VirtualList extends React.PureComponent<Props, State> {
       itemSize,
       onItemsRendered,
       onScroll,
+      onAlign,
       scrollDirection = DIRECTION_VERTICAL,
       scrollOffset,
       scrollToIndex,
       scrollToAlignment,
+      shouldScrollAlign,
       style,
       width,
       ...props
