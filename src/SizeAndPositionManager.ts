@@ -131,10 +131,8 @@ export default class SizeAndPositionManager {
     const lastMeasuredSizeAndPosition = this.getSizeAndPositionOfLastMeasuredItem()
     const extraSize =
       this.align === ALIGN_CENTER
-        ? this.containerSize - this.estimatedItemSize
-        : this.align === ALIGN_END
-          ? (this.containerSize - this.estimatedItemSize) * 2
-          : 0
+        ? (this.containerSize - this.estimatedItemSize) / 2
+        : 0
     return (
       lastMeasuredSizeAndPosition.offset +
       lastMeasuredSizeAndPosition.size +

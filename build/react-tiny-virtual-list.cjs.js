@@ -134,7 +134,7 @@ var SizeAndPositionManager = function () {
      */
     SizeAndPositionManager.prototype.getTotalSize = function () {
         var lastMeasuredSizeAndPosition = this.getSizeAndPositionOfLastMeasuredItem();
-        var extraSize = this.align === ALIGN_CENTER ? this.containerSize - this.estimatedItemSize : this.align === ALIGN_END ? (this.containerSize - this.estimatedItemSize) * 2 : 0;
+        var extraSize = this.align === ALIGN_CENTER ? (this.containerSize - this.estimatedItemSize) / 2 : 0;
         return lastMeasuredSizeAndPosition.offset + lastMeasuredSizeAndPosition.size + (this.itemCount - this.lastMeasuredIndex - 1) * this.estimatedItemSize + extraSize;
     };
     /**

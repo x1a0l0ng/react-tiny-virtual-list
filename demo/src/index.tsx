@@ -50,7 +50,7 @@ class Demo extends React.Component {
           itemSize={60}
           className="VirtualList"
           shouldScrollAlign
-          scrollToAlignment="end"
+          scrollToAlignment="center"
           onAlign={index => {
             console.log('onAlign:', index)
           }}
