@@ -146,6 +146,10 @@ export default class VirtualList extends React.PureComponent<Props, State> {
     itemCount: this.props.itemCount,
     itemSizeGetter: index => this.getSize(index),
     estimatedItemSize: this.getEstimatedItemSize(),
+    containerSize: this.props[
+      sizeProp[this.props.scrollDirection || DIRECTION_VERTICAL]
+    ],
+    align: this.props.scrollToAlignment,
   })
 
   state = {
@@ -179,6 +183,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
       scrollOffset,
       scrollToAlignment,
       scrollToIndex,
+      scrollDirection,
     } = this.props
     const scrollPropsHaveChanged =
       nextProps.scrollToIndex !== scrollToIndex ||
@@ -190,11 +195,17 @@ export default class VirtualList extends React.PureComponent<Props, State> {
 
     if (
       nextProps.itemCount !== itemCount ||
-      nextProps.estimatedItemSize !== estimatedItemSize
+      nextProps.estimatedItemSize !== estimatedItemSize ||
+      nextProps.scrollToAlignment !== scrollToAlignment ||
+      nextProps.scrollDirection != scrollDirection
     ) {
       this.sizeAndPositionManager.updateConfig({
         itemCount: nextProps.itemCount,
         estimatedItemSize: this.getEstimatedItemSize(nextProps),
+        containerSize: this.props[
+          sizeProp[nextProps.scrollDirection || scrollDirection || DIRECTION_VERTICAL]
+        ],
+        align: nextProps.scrollToAlignment || scrollToAlignment,
       })
     }
 
@@ -242,7 +253,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
     let calcOffset = offset
     switch (scrollToAlignment) {
       case ALIGN_END:
-        calcOffset += size
+        calcOffset += size - this.getEstimatedItemSize()
         break
       case ALIGN_CENTER:
         calcOffset += Math.round(size / 2)

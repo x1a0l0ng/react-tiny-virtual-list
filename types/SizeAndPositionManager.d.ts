@@ -9,17 +9,23 @@ export interface Options {
     itemCount: number;
     itemSizeGetter: ItemSizeGetter;
     estimatedItemSize: number;
+    containerSize: number;
+    align: ALIGNMENT | undefined;
 }
 export default class SizeAndPositionManager {
     private itemSizeGetter;
     private itemCount;
     private estimatedItemSize;
+    private containerSize;
     private lastMeasuredIndex;
     private itemSizeAndPositionData;
-    constructor({itemCount, itemSizeGetter, estimatedItemSize}: Options);
-    updateConfig({itemCount, estimatedItemSize}: {
+    private align;
+    constructor({itemCount, itemSizeGetter, estimatedItemSize, containerSize, align}: Options);
+    updateConfig({itemCount, estimatedItemSize, containerSize, align}: {
         itemCount: number;
         estimatedItemSize: number;
+        containerSize: number;
+        align: ALIGNMENT | undefined;
     }): void;
     getLastMeasuredIndex(): number;
     /**
@@ -27,6 +33,7 @@ export default class SizeAndPositionManager {
      * It just-in-time calculates (or used cached values) for items leading up to the index.
      */
     getSizeAndPositionForIndex(index: number): SizeAndPosition;
+    getAlignOffset(): number;
     getSizeAndPositionOfLastMeasuredItem(): SizeAndPosition;
     /**
      * Total size of all items being measured.

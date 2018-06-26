@@ -67,10 +67,15 @@ var SizeAndPositionManager = function () {
     function SizeAndPositionManager(_a) {
         var itemCount = _a.itemCount,
             itemSizeGetter = _a.itemSizeGetter,
-            estimatedItemSize = _a.estimatedItemSize;
+            estimatedItemSize = _a.estimatedItemSize,
+            containerSize = _a.containerSize,
+            _b = _a.align,
+            align = _b === void 0 ? ALIGN_START : _b;
         this.itemSizeGetter = itemSizeGetter;
         this.itemCount = itemCount;
         this.estimatedItemSize = estimatedItemSize;
+        this.containerSize = containerSize;
+        this.align = align;
         // Cache of size and position data for items, mapped by item index.
         this.itemSizeAndPositionData = {};
         // Measurements for items up to this index can be trusted; items afterward should be estimated.
@@ -78,9 +83,14 @@ var SizeAndPositionManager = function () {
     }
     SizeAndPositionManager.prototype.updateConfig = function (_a) {
         var itemCount = _a.itemCount,
-            estimatedItemSize = _a.estimatedItemSize;
+            estimatedItemSize = _a.estimatedItemSize,
+            containerSize = _a.containerSize,
+            _b = _a.align,
+            align = _b === void 0 ? ALIGN_START : _b;
         this.itemCount = itemCount;
         this.estimatedItemSize = estimatedItemSize;
+        this.containerSize = containerSize;
+        this.align = align;
     };
     SizeAndPositionManager.prototype.getLastMeasuredIndex = function () {
         return this.lastMeasuredIndex;
@@ -111,8 +121,11 @@ var SizeAndPositionManager = function () {
         }
         return this.itemSizeAndPositionData[index];
     };
+    SizeAndPositionManager.prototype.getAlignOffset = function () {
+        return this.align === ALIGN_CENTER ? (this.containerSize - this.estimatedItemSize) / 2 : this.align === ALIGN_END ? this.containerSize - this.estimatedItemSize : 0;
+    };
     SizeAndPositionManager.prototype.getSizeAndPositionOfLastMeasuredItem = function () {
-        return this.lastMeasuredIndex >= 0 ? this.itemSizeAndPositionData[this.lastMeasuredIndex] : { offset: 0, size: 0 };
+        return this.lastMeasuredIndex >= 0 ? this.itemSizeAndPositionData[this.lastMeasuredIndex] : { offset: this.getAlignOffset(), size: 0 };
     };
     /**
      * Total size of all items being measured.
@@ -121,7 +134,8 @@ var SizeAndPositionManager = function () {
      */
     SizeAndPositionManager.prototype.getTotalSize = function () {
         var lastMeasuredSizeAndPosition = this.getSizeAndPositionOfLastMeasuredItem();
-        return lastMeasuredSizeAndPosition.offset + lastMeasuredSizeAndPosition.size + (this.itemCount - this.lastMeasuredIndex - 1) * this.estimatedItemSize;
+        var extraSize = this.align === ALIGN_CENTER ? this.containerSize - this.estimatedItemSize : this.align === ALIGN_END ? (this.containerSize - this.estimatedItemSize) * 2 : 0;
+        return lastMeasuredSizeAndPosition.offset + lastMeasuredSizeAndPosition.size + (this.itemCount - this.lastMeasuredIndex - 1) * this.estimatedItemSize + extraSize;
     };
     /**
      * Determines a new offset that ensures a certain item is visible, given the alignment.
@@ -132,7 +146,7 @@ var SizeAndPositionManager = function () {
      */
     SizeAndPositionManager.prototype.getUpdatedOffsetForIndex = function (_a) {
         var _b = _a.align,
-            align = _b === void 0 ? ALIGN_START : _b,
+            align = _b === void 0 ? this.align : _b,
             containerSize = _a.containerSize,
             currentOffset = _a.currentOffset,
             targetIndex = _a.targetIndex;
@@ -306,7 +320,9 @@ var VirtualList = function (_super) {
             itemSizeGetter: function (index) {
                 return _this.getSize(index);
             },
-            estimatedItemSize: _this.getEstimatedItemSize()
+            estimatedItemSize: _this.getEstimatedItemSize(),
+            containerSize: _this.props[sizeProp[_this.props.scrollDirection || DIRECTION_VERTICAL]],
+            align: _this.props.scrollToAlignment
         });
         _this.state = {
             offset: _this.props.scrollOffset || _this.props.scrollToIndex != null && _this.getOffsetForIndex(_this.props.scrollToIndex) || 0,
@@ -322,7 +338,7 @@ var VirtualList = function (_super) {
             var calcOffset = offset;
             switch (scrollToAlignment) {
                 case ALIGN_END:
-                    calcOffset += size;
+                    calcOffset += size - _this.getEstimatedItemSize();
                     break;
                 case ALIGN_CENTER:
                     calcOffset += Math.round(size / 2);
@@ -380,13 +396,16 @@ var VirtualList = function (_super) {
             itemSize = _a.itemSize,
             scrollOffset = _a.scrollOffset,
             scrollToAlignment = _a.scrollToAlignment,
-            scrollToIndex = _a.scrollToIndex;
+            scrollToIndex = _a.scrollToIndex,
+            scrollDirection = _a.scrollDirection;
         var scrollPropsHaveChanged = nextProps.scrollToIndex !== scrollToIndex || nextProps.scrollToAlignment !== scrollToAlignment;
         var itemPropsHaveChanged = nextProps.itemCount !== itemCount || nextProps.itemSize !== itemSize || nextProps.estimatedItemSize !== estimatedItemSize;
-        if (nextProps.itemCount !== itemCount || nextProps.estimatedItemSize !== estimatedItemSize) {
+        if (nextProps.itemCount !== itemCount || nextProps.estimatedItemSize !== estimatedItemSize || nextProps.scrollToAlignment !== scrollToAlignment || nextProps.scrollDirection != scrollDirection) {
             this.sizeAndPositionManager.updateConfig({
                 itemCount: nextProps.itemCount,
-                estimatedItemSize: this.getEstimatedItemSize(nextProps)
+                estimatedItemSize: this.getEstimatedItemSize(nextProps),
+                containerSize: this.props[sizeProp[nextProps.scrollDirection || scrollDirection || DIRECTION_VERTICAL]],
+                align: nextProps.scrollToAlignment || scrollToAlignment
             });
         }
         if (itemPropsHaveChanged) {

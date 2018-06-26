@@ -17,19 +17,31 @@ export interface Options {
   itemCount: number
   itemSizeGetter: ItemSizeGetter
   estimatedItemSize: number
+  containerSize: number
+  align: ALIGNMENT | undefined
 }
 
 export default class SizeAndPositionManager {
   private itemSizeGetter: ItemSizeGetter
   private itemCount: number
   private estimatedItemSize: number
+  private containerSize: number
   private lastMeasuredIndex: number
   private itemSizeAndPositionData: SizeAndPositionData
+  private align: ALIGNMENT
 
-  constructor({ itemCount, itemSizeGetter, estimatedItemSize }: Options) {
+  constructor({
+    itemCount,
+    itemSizeGetter,
+    estimatedItemSize,
+    containerSize,
+    align = ALIGN_START,
+  }: Options) {
     this.itemSizeGetter = itemSizeGetter
     this.itemCount = itemCount
     this.estimatedItemSize = estimatedItemSize
+    this.containerSize = containerSize
+    this.align = align
 
     // Cache of size and position data for items, mapped by item index.
     this.itemSizeAndPositionData = {}
@@ -41,12 +53,18 @@ export default class SizeAndPositionManager {
   updateConfig({
     itemCount,
     estimatedItemSize,
+    containerSize,
+    align = ALIGN_START,
   }: {
     itemCount: number
     estimatedItemSize: number
+    containerSize: number
+    align: ALIGNMENT | undefined
   }) {
     this.itemCount = itemCount
     this.estimatedItemSize = estimatedItemSize
+    this.containerSize = containerSize
+    this.align = align
   }
 
   getLastMeasuredIndex() {
@@ -90,10 +108,18 @@ export default class SizeAndPositionManager {
     return this.itemSizeAndPositionData[index]
   }
 
+  getAlignOffset() {
+    return this.align === ALIGN_CENTER
+      ? (this.containerSize - this.estimatedItemSize) / 2
+      : this.align === ALIGN_END
+        ? this.containerSize - this.estimatedItemSize
+        : 0
+  }
+
   getSizeAndPositionOfLastMeasuredItem() {
     return this.lastMeasuredIndex >= 0
       ? this.itemSizeAndPositionData[this.lastMeasuredIndex]
-      : { offset: 0, size: 0 }
+      : { offset: this.getAlignOffset(), size: 0 }
   }
 
   /**
@@ -103,11 +129,17 @@ export default class SizeAndPositionManager {
    */
   getTotalSize(): number {
     const lastMeasuredSizeAndPosition = this.getSizeAndPositionOfLastMeasuredItem()
-
+    const extraSize =
+      this.align === ALIGN_CENTER
+        ? this.containerSize - this.estimatedItemSize
+        : this.align === ALIGN_END
+          ? (this.containerSize - this.estimatedItemSize) * 2
+          : 0
     return (
       lastMeasuredSizeAndPosition.offset +
       lastMeasuredSizeAndPosition.size +
-      (this.itemCount - this.lastMeasuredIndex - 1) * this.estimatedItemSize
+      (this.itemCount - this.lastMeasuredIndex - 1) * this.estimatedItemSize +
+      extraSize
     )
   }
 
@@ -119,7 +151,7 @@ export default class SizeAndPositionManager {
    * @return Offset to use to ensure the specified item is visible
    */
   getUpdatedOffsetForIndex({
-    align = ALIGN_START,
+    align = this.align,
     containerSize,
     currentOffset,
     targetIndex,
@@ -136,7 +168,6 @@ export default class SizeAndPositionManager {
     const datum = this.getSizeAndPositionForIndex(targetIndex)
     const maxOffset = datum.offset
     const minOffset = maxOffset - containerSize + datum.size
-
     let idealOffset
 
     switch (align) {
@@ -154,7 +185,6 @@ export default class SizeAndPositionManager {
     }
 
     const totalSize = this.getTotalSize()
-
     return Math.max(0, Math.min(totalSize - containerSize, idealOffset))
   }
 
