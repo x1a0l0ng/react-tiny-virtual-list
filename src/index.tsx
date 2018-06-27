@@ -99,6 +99,7 @@ export interface Props {
 export interface State {
   offset: number
   scrollChangeReason: SCROLL_CHANGE_REASON
+  scrolling: boolean
 }
 
 export default class VirtualList extends React.PureComponent<Props, State> {
@@ -159,6 +160,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
         this.getOffsetForIndex(this.props.scrollToIndex)) ||
       0,
     scrollChangeReason: SCROLL_CHANGE_REQUESTED,
+    scrolling: false,
   }
 
   private rootNode: HTMLElement
@@ -203,7 +205,9 @@ export default class VirtualList extends React.PureComponent<Props, State> {
         itemCount: nextProps.itemCount,
         estimatedItemSize: this.getEstimatedItemSize(nextProps),
         containerSize: this.props[
-          sizeProp[nextProps.scrollDirection || scrollDirection || DIRECTION_VERTICAL]
+          sizeProp[
+            nextProps.scrollDirection || scrollDirection || DIRECTION_VERTICAL
+          ]
         ],
         align: nextProps.scrollToAlignment || scrollToAlignment,
       })
@@ -278,6 +282,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
     this.setState({
       offset,
       scrollChangeReason: SCROLL_CHANGE_OBSERVED,
+      scrolling: shouldScrollAlign || false,
     })
 
     if (shouldScrollAlign && !this.scrollAnimating) {
@@ -285,6 +290,9 @@ export default class VirtualList extends React.PureComponent<Props, State> {
       this.delayAlignment = setTimeout(() => {
         const alignedIndex = this.findAlignedIndex(offset)
         this.scrollAnimTo(this.getOffsetForIndex(alignedIndex))
+        this.setState({
+          scrolling: false,
+        })
         if (typeof onAlign === 'function') {
           onAlign(alignedIndex)
         }
@@ -419,7 +427,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
       width,
       ...props
     } = this.props
-    const { offset } = this.state
+    const { offset, scrolling } = this.state
     const { start, stop } = this.sizeAndPositionManager.getVisibleRange({
       containerSize: this.props[sizeProp[scrollDirection]] || 0,
       offset,
@@ -453,6 +461,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
         style={{ ...STYLE_WRAPPER, ...style, height, width }}
       >
         <div
+          className={scrolling ? 'scrolling' : ''}
           style={{
             ...STYLE_INNER,
             [sizeProp[

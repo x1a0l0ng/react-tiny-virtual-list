@@ -326,7 +326,8 @@ var VirtualList = function (_super) {
         });
         _this.state = {
             offset: _this.props.scrollOffset || _this.props.scrollToIndex != null && _this.getOffsetForIndex(_this.props.scrollToIndex) || 0,
-            scrollChangeReason: SCROLL_CHANGE_REQUESTED
+            scrollChangeReason: SCROLL_CHANGE_REQUESTED,
+            scrolling: false
         };
         _this.styleCache = {};
         _this.findAlignedIndex = function (offset) {
@@ -358,13 +359,17 @@ var VirtualList = function (_super) {
             }
             _this.setState({
                 offset: offset,
-                scrollChangeReason: SCROLL_CHANGE_OBSERVED
+                scrollChangeReason: SCROLL_CHANGE_OBSERVED,
+                scrolling: shouldScrollAlign || false
             });
             if (shouldScrollAlign && !_this.scrollAnimating) {
                 clearTimeout(_this.delayAlignment);
                 _this.delayAlignment = setTimeout(function () {
                     var alignedIndex = _this.findAlignedIndex(offset);
                     _this.scrollAnimTo(_this.getOffsetForIndex(alignedIndex));
+                    _this.setState({
+                        scrolling: false
+                    });
                     if (typeof onAlign === 'function') {
                         onAlign(alignedIndex);
                     }
@@ -537,14 +542,16 @@ var VirtualList = function (_super) {
             style = _a.style,
             width = _a.width,
             props = __rest(_a, ["estimatedItemSize", "height", "overscanCount", "renderItem", "itemCount", "itemSize", "onItemsRendered", "onScroll", "onAlign", "scrollDirection", "scrollOffset", "scrollToIndex", "scrollToAlignment", "shouldScrollAlign", "style", "width"]);
-        var offset = this.state.offset;
-        var _d = this.sizeAndPositionManager.getVisibleRange({
+        var _d = this.state,
+            offset = _d.offset,
+            scrolling = _d.scrolling;
+        var _e = this.sizeAndPositionManager.getVisibleRange({
             containerSize: this.props[sizeProp[scrollDirection]] || 0,
             offset: offset,
             overscanCount: overscanCount
         }),
-            start = _d.start,
-            stop = _d.stop;
+            start = _e.start,
+            stop = _e.stop;
         var items = [];
         if (typeof start !== 'undefined' && typeof stop !== 'undefined') {
             for (var index = start; index <= stop; index++) {
@@ -560,8 +567,8 @@ var VirtualList = function (_super) {
                 });
             }
         }
-        return React.createElement("div", __assign({ ref: this.getRef }, props, { onScroll: this.handleScroll, style: __assign({}, STYLE_WRAPPER, style, { height: height, width: width }) }), React.createElement("div", { style: __assign({}, STYLE_INNER, (_e = {}, _e[sizeProp[scrollDirection]] = this.sizeAndPositionManager.getTotalSize(), _e)) }, items));
-        var _e;
+        return React.createElement("div", __assign({ ref: this.getRef }, props, { onScroll: this.handleScroll, style: __assign({}, STYLE_WRAPPER, style, { height: height, width: width }) }), React.createElement("div", { className: scrolling ? 'scrolling' : '', style: __assign({}, STYLE_INNER, (_f = {}, _f[sizeProp[scrollDirection]] = this.sizeAndPositionManager.getTotalSize(), _f)) }, items));
+        var _f;
     };
     VirtualList.defaultProps = {
         overscanCount: 3,

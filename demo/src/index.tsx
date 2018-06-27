@@ -17,7 +17,16 @@ class Demo extends React.Component {
     index: number
   }) => {
     return (
-      <div className="Row" style={style} key={index}>
+      <div
+        className="Row"
+        style={style}
+        key={index}
+        onClick={() => {
+          this.refs.scroller['scrollAnimTo'](
+            this.refs.scroller['getOffsetForIndex'](index)
+          )
+        }}
+      >
         Row #{index}
       </div>
     )
@@ -45,12 +54,12 @@ class Demo extends React.Component {
           ref="scroller"
           width="auto"
           height={300}
-          itemCount={1000}
+          itemCount={100000}
           renderItem={this.renderItem}
           itemSize={60}
           className="VirtualList"
-          shouldScrollAlign
           scrollToAlignment="center"
+          shouldScrollAlign
           onAlign={index => {
             console.log('onAlign:', index)
           }}

@@ -40,6 +40,7 @@ export interface Props {
 export interface State {
     offset: number;
     scrollChangeReason: SCROLL_CHANGE_REASON;
+    scrolling: boolean;
 }
 export default class VirtualList extends React.PureComponent<Props, State> {
     static defaultProps: {
@@ -70,6 +71,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
     state: {
         offset: number;
         scrollChangeReason: SCROLL_CHANGE_REASON;
+        scrolling: boolean;
     };
     private rootNode;
     private styleCache;
