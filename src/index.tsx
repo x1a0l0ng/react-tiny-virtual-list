@@ -296,7 +296,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
         if (typeof onAlign === 'function') {
           onAlign(alignedIndex)
         }
-      }, 50)
+      }, 100)
     }
 
     if (typeof onScroll === 'function') {
