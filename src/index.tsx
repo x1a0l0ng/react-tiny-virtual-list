@@ -20,7 +20,7 @@ import {
 
 const STYLE_WRAPPER: React.CSSProperties = {
   overflow: 'auto',
-  willChange: 'transform',
+  willChange: 'scroll-position, top',
   WebkitOverflowScrolling: 'touch',
 }
 
