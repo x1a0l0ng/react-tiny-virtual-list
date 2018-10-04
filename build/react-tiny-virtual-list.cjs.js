@@ -283,7 +283,7 @@ var SizeAndPositionManager = function () {
 
 var STYLE_WRAPPER = {
     overflow: 'auto',
-    willChange: 'transform',
+    willChange: 'scroll-position, top',
     WebkitOverflowScrolling: 'touch'
 };
 var STYLE_INNER = {
