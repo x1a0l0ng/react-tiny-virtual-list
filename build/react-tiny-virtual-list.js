@@ -383,6 +383,9 @@ var VirtualList = function (_super) {
         _this.getRef = function (node) {
             _this.rootNode = node;
         };
+        _this.getRootNode = function () {
+            return _this.rootNode || {};
+        };
         return _this;
     }
     VirtualList.prototype.componentDidMount = function () {
@@ -446,12 +449,12 @@ var VirtualList = function (_super) {
     VirtualList.prototype.getNodeOffset = function () {
         var _a = this.props.scrollDirection,
             scrollDirection = _a === void 0 ? DIRECTION_VERTICAL : _a;
-        return this.rootNode[scrollProp[scrollDirection]];
+        return this.getRootNode()[scrollProp[scrollDirection]];
     };
     VirtualList.prototype.scrollTo = function (value) {
         var _a = this.props.scrollDirection,
             scrollDirection = _a === void 0 ? DIRECTION_VERTICAL : _a;
-        this.rootNode[scrollProp[scrollDirection]] = value;
+        this.getRootNode()[scrollProp[scrollDirection]] = value;
     };
     VirtualList.prototype.scrollAnimTo = function (targetPos) {
         var _this = this;
@@ -466,7 +469,7 @@ var VirtualList = function (_super) {
             animateScroll = function () {
             var progress = new Date().getTime() - startTime,
                 percent = progress >= duration ? 1 : easeInOutCubic(progress / duration);
-            _this.rootNode[scrollProp[scrollDirection]] = startPos + Math.ceil(targetOffset * percent);
+            _this.getRootNode()[scrollProp[scrollDirection]] = startPos + Math.ceil(targetOffset * percent);
             if (percent < 1) {
                 _this.scrollAnimation = rAF(animateScroll);
                 return;

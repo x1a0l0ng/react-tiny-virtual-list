@@ -92,4 +92,5 @@ export default class VirtualList extends React.PureComponent<Props, State> {
     recomputeSizes(startIndex?: number): void;
     render(): JSX.Element;
     private getRef;
+    private getRootNode;
 }

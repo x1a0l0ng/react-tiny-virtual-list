@@ -314,12 +314,12 @@ export default class VirtualList extends React.PureComponent<Props, State> {
 
   getNodeOffset() {
     const { scrollDirection = DIRECTION_VERTICAL } = this.props
-    return this.rootNode[scrollProp[scrollDirection]]
+    return this.getRootNode()[scrollProp[scrollDirection]]
   }
 
   scrollTo(value: number) {
     const { scrollDirection = DIRECTION_VERTICAL } = this.props
-    this.rootNode[scrollProp[scrollDirection]] = value
+    this.getRootNode()[scrollProp[scrollDirection]] = value
   }
 
   scrollAnimTo(targetPos: number) {
@@ -342,7 +342,7 @@ export default class VirtualList extends React.PureComponent<Props, State> {
           percent =
             progress >= duration ? 1 : easeInOutCubic(progress / duration)
 
-        this.rootNode[scrollProp[scrollDirection]] =
+        this.getRootNode()[scrollProp[scrollDirection]] =
           startPos + Math.ceil(targetOffset * percent)
         if (percent < 1) {
           this.scrollAnimation = rAF(animateScroll)
@@ -477,5 +477,9 @@ export default class VirtualList extends React.PureComponent<Props, State> {
 
   private getRef = (node: HTMLDivElement): void => {
     this.rootNode = node
+  }
+
+  private getRootNode = (): any => {
+    return this.rootNode || {}
   }
 }
